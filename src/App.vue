@@ -41,9 +41,9 @@ const rank = role => `${pad(role.currentCount)},${pad(role.number)}`
 
 const role = (name, number, count) => ({name, number, count, currentCount: count})
     , roleInit = [
-  role('Princess', 8, 1),
-  role('Countess', 7, 1),
-  role('King', 6, 1),
+  role('Countess', 8, 1),
+  role('King', 7, 1),
+  role('Chancellor', 6, 2),
   role('Prince', 5, 2),
   role('Handmaid', 4, 2),
   role('Baron', 3, 2),
