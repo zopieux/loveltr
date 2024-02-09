@@ -2,33 +2,33 @@
   <FlipCard v-bind:flipped="flipped" duration="0.4s">
     <template v-slot:front>
       <section>
-        <Cards :roles="sortedRolesProbability"
-               @increase="(number) => changeRoleCount(number, +1)"
-               @decrease="(number) => changeRoleCount(number, -1)"/>
-        <IconSettings class="icon settings" @click="flip"/>
-        <IconReset class="icon reset" @click="reset"/>
+        <Cards :roles="sortedRolesProbability" @increase="(number) => changeRoleCount(number, +1)"
+          @decrease="(number) => changeRoleCount(number, -1)" />
+        <IconSettings class="icon settings" @click="flip" />
+        <IconReset class="icon reset" @click="reset" />
       </section>
     </template>
     <template v-slot:back>
       <section>
-        <IconSettings class="icon settings" @click="flip"/>
-        <h4>Settings</h4>
-        <Config :roles="roles"
-                @increase="(number) => changeRoleSetting(number, +1)"
-                @decrease="(number) => changeRoleSetting(number, -1)"/>
+        <IconSettings class="icon settings" @click="flip" />
+        <h4>{{ $t('settings') }}</h4>
+        <Config :roles="roles" @increase="(number) => changeRoleSetting(number, +1)"
+          @decrease="(number) => changeRoleSetting(number, -1)" @resetDefaults="resetSettings" />
       </section>
     </template>
   </FlipCard>
 </template>
 
 <script setup>
-import {ref, computed} from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useStorage } from '@vueuse/core'
 
 import FlipCard from './components/FlipCard.vue'
 import Config from './components/Config.vue'
 import Cards from './components/Cards.vue'
-import IconSettings from './components/IconSettings.vue';
-import IconReset from './components/IconReset.vue';
+import IconSettings from './components/IconSettings.vue'
+import IconReset from './components/IconReset.vue'
 
 function sorted(arr, f, sign) {
   const c = [...arr]
@@ -39,30 +39,44 @@ function sorted(arr, f, sign) {
 const pad = e => `${e}`.padStart(4, '0')
 const rank = role => `${pad(role.currentCount)},${pad(role.number)}`
 
-const role = (name, number, count) => ({name, number, count, currentCount: count})
-    , roleInit = [
-  role('Countess', 8, 1),
-  role('King', 7, 1),
-  role('Chancellor', 6, 2),
-  role('Prince', 5, 2),
-  role('Handmaid', 4, 2),
-  role('Baron', 3, 2),
-  role('Priest', 2, 2),
-  role('Guard', 1, 6),
-  role('Spy', 0, 2),
-]
-    , numberToRoleIdx = Object.fromEntries(roleInit.map((r, i) => [r.number, i]))
+const saneLanguageDeepCopy = (e) => JSON.parse(JSON.stringify(e))
+
+const role = (name, number, count) => ({ name, number, count, currentCount: count })
+  , roleInit = [
+    role('princess', 9, 1),
+    role('countess', 8, 1),
+    role('king', 7, 1),
+    role('chancellor', 6, 2),
+    role('prince', 5, 2),
+    role('handmaid', 4, 2),
+    role('baron', 3, 2),
+    role('priest', 2, 2),
+    role('guard', 1, 6),
+    role('spy', 0, 2),
+  ]
+  , roleInitDefault = saneLanguageDeepCopy(roleInit)
+  , numberToRoleIdx = Object.fromEntries(roleInit.map((r, i) => [r.number, i]))
+
+const settings = useStorage('settings',
+  { locale: 'en', roles: roleInitDefault, },
+  localStorage, { mergeDefaults: true })
+
+const { locale } = useI18n()
+locale.value = settings.value.locale
+watch(locale, () => settings.value.locale = locale)
 
 const roles = ref(roleInit)
-    , flipped = ref(false)
-    , sortedRolesProbability = computed(() => sorted(roles.value, rank, -1))
+  , flipped = ref(false)
+  , sortedRolesProbability = computed(() => sorted(roles.value.filter(role => role.count > 0), rank, -1))
+
+roles.value = settings.value.roles
 
 function flip() {
   flipped.value = !flipped.value
 }
 
 function reset() {
-  roles.value = roles.value.map(role => ({...role, currentCount: role.count}))
+  roles.value = roles.value.map(role => ({ ...role, currentCount: role.count }))
 }
 
 function changeRoleCount(number, sign) {
@@ -70,11 +84,19 @@ function changeRoleCount(number, sign) {
   if (0 <= updated && updated <= roles.value[idx].count) {
     roles.value[idx].currentCount = updated
   }
+  settings.value.roles = roles.value
 }
 
 function changeRoleSetting(number, sign) {
   const idx = numberToRoleIdx[number]
   roles.value[idx].count += sign
+  roles.value[idx].currentCount = Math.min(roles.value[idx].count, roles.value[idx].currentCount)
+  settings.value.roles = roles.value
+}
+
+function resetSettings() {
+  roles.value = saneLanguageDeepCopy(roleInitDefault)
+  settings.value.roles = roles.value
 }
 </script>
 
