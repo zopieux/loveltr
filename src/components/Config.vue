@@ -37,7 +37,7 @@ select.lang, button
   font: inherit
 
 main
-  width: 100%
+  width: fit-content
   padding-inline: 1rem
   column-gap: 1rem
   row-gap: .5rem

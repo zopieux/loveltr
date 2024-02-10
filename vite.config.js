@@ -25,7 +25,7 @@ export default defineConfig({
         scope: './',
         background_color: '#ffffff',
         theme_color: '#db9714',
-        display: 'standalone',
+        display: 'fullscreen',
       }
     }),
   ],

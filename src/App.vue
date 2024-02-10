@@ -1,22 +1,20 @@
 <template>
-  <FlipCard v-bind:flipped="flipped" duration="0.4s">
-    <template v-slot:front>
-      <section>
-        <Cards :roles="sortedRolesProbability" @increase="(number) => changeRoleCount(number, +1)"
-          @decrease="(number) => changeRoleCount(number, -1)" />
-        <IconSettings class="icon settings" @click="flip" />
-        <IconReset class="icon reset" @click="reset" />
-      </section>
-    </template>
-    <template v-slot:back>
-      <section>
-        <IconSettings class="icon settings" @click="flip" />
-        <h4>{{ $t('settings') }}</h4>
-        <Config :roles="roles" @increase="(number) => changeRoleSetting(number, +1)"
-          @decrease="(number) => changeRoleSetting(number, -1)" @resetDefaults="resetSettings" />
-      </section>
-    </template>
-  </FlipCard>
+  <template v-if="!showSettings">
+    <section>
+      <Cards :roles="sortedRolesProbability" @increase="(number) => changeRoleCount(number, +1)"
+        @decrease="(number) => changeRoleCount(number, -1)" />
+      <IconSettings class="icon settings" @click="toggleSettings" />
+      <IconReset class="icon reset" @click="reset" />
+    </section>
+  </template>
+  <template v-if="showSettings">
+    <section>
+      <IconSettings class="icon settings" @click="toggleSettings" />
+      <h4>{{ $t('settings') }}</h4>
+      <Config :roles="roles" @increase="(number) => changeRoleSetting(number, +1)"
+        @decrease="(number) => changeRoleSetting(number, -1)" @resetDefaults="resetSettings" />
+    </section>
+  </template>
 </template>
 
 <script setup>
@@ -24,7 +22,6 @@ import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStorage } from '@vueuse/core'
 
-import FlipCard from './components/FlipCard.vue'
 import Config from './components/Config.vue'
 import Cards from './components/Cards.vue'
 import IconSettings from './components/IconSettings.vue'
@@ -66,17 +63,18 @@ locale.value = settings.value.locale
 watch(locale, () => settings.value.locale = locale)
 
 const roles = ref(roleInit)
-  , flipped = ref(false)
+  , showSettings = ref(false)
   , sortedRolesProbability = computed(() => sorted(roles.value.filter(role => role.count > 0), rank, -1))
 
 roles.value = settings.value.roles
 
-function flip() {
-  flipped.value = !flipped.value
+function toggleSettings() {
+  showSettings.value = !showSettings.value
 }
 
 function reset() {
   roles.value = roles.value.map(role => ({ ...role, currentCount: role.count }))
+  settings.value.roles = roles.value
 }
 
 function changeRoleCount(number, sign) {
@@ -105,7 +103,7 @@ section
   display: flex
   align-items: center
   flex-direction: column
-  gap: 1rem
+  gap: 0.7rem
 
 h4
   font-size: 2rem
