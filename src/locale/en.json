@@ -11,6 +11,8 @@
     "spy": "Spy",
     "settings": "Settings",
     "defaults": "Reset defaults",
+    "columnar": "Columnar",
+    "grid": "Grid",
     "en": "English",
     "fr": "Français"
 }

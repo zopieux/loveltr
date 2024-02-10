@@ -1,5 +1,5 @@
 <template>
-  <div class="wrap">
+  <div :class="{wrap: true, columnar: props.layout === 'columnar'}">
     <svg viewBox="0 0 503 747" :class="[{ empty: props.currentCount === 0, [`number-${props.number}`]: true }]">
       <defs>
         <pattern patternUnits="userSpaceOnUse" :id="patId" x="0" y="0" width="300" height="300">
@@ -56,6 +56,7 @@ const props = defineProps({
   number: Number,
   count: Number,
   currentCount: Number,
+  layout: String,
 })
 
 const bgUrl = computed(() =>
@@ -104,6 +105,12 @@ const buildId = p => `_${p}_id_${props.name.toLowerCase()}`
       &.disabled
         box-shadow: 0 0 0 2px #999
         filter: grayscale(1)
+
+  &.columnar .dots
+    top: 1%
+
+    .dot
+      width: calc(100% / 8)
 
 svg
   pointer-events: none

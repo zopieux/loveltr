@@ -6,10 +6,13 @@
         <h4>{{ $t('settings') }}</h4>
       </header>
       <div class="row">
-        <select class="lang" v-model="$i18n.locale">
+        <select v-model="$i18n.locale">
           <option v-for="locale in $i18n.availableLocales" :key="`locale-${locale}`" :value="locale">{{
             locale.toUpperCase()
           }}</option>
+        </select>
+        <select v-model="layout">
+          <option v-for="kind in ['grid', 'columnar']" :key="kind" :value="kind">{{ $t(kind) }}</option>
         </select>
         <button @click="$emit('resetDefaults')">{{ $t("defaults") }}</button>
       </div>
@@ -30,10 +33,10 @@
 
 <script setup>
 import IconSettings from './IconSettings.vue'
-
 defineProps({
   roles: Array,
 })
+const layout = defineModel('layout', { default: 'grid' })
 defineEmits(['decrease', 'increase', 'resetDefaults', 'close'])
 </script>
 
@@ -85,7 +88,7 @@ aside
     justify-content: center
     gap: $gap
 
-select.lang, button
+select, button
   font: inherit
 
 main

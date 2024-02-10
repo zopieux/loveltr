@@ -1,6 +1,6 @@
 <template>
   <template v-if="!showSettings">
-    <Cards :roles="sortedRolesProbability" @increase="(number) => changeRoleCount(number, +1)"
+    <Cards :roles="sortedRolesProbability" :layout="layout" @increase="(number) => changeRoleCount(number, +1)"
       @decrease="(number) => changeRoleCount(number, -1)" />
     <div class="buttons">
       <IconSettings class="icon" @click="toggleSettings" />
@@ -8,13 +8,14 @@
     </div>
   </template>
   <template v-if="showSettings">
-    <Config :roles="roles" @close="toggleSettings" @increase="(number) => changeRoleSetting(number, +1)"
-      @decrease="(number) => changeRoleSetting(number, -1)" @resetDefaults="resetSettings" />
+    <Config :roles="roles" v-model:layout="layout" @close="toggleSettings"
+      @increase="(number) => changeRoleSetting(number, +1)" @decrease="(number) => changeRoleSetting(number, -1)"
+      @resetDefaults="resetSettings" />
   </template>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, defineModel } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStorage } from '@vueuse/core'
 
@@ -49,14 +50,18 @@ const role = (name, number, count) => ({ name, number, count, currentCount: coun
   ]
   , roleInitDefault = saneLanguageDeepCopy(roleInit)
   , numberToRoleIdx = Object.fromEntries(roleInit.map((r, i) => [r.number, i]))
+  , layout = defineModel(String)
 
 const settings = useStorage('settings',
-  { locale: 'en', roles: roleInitDefault, },
+  { locale: 'en', roles: roleInitDefault, layout: 'grid' },
   localStorage, { mergeDefaults: true })
 
 const { locale } = useI18n()
 locale.value = settings.value.locale
 watch(locale, () => settings.value.locale = locale)
+
+layout.value = settings.value.layout
+watch(layout, () => settings.value.layout = layout)
 
 const roles = ref(roleInit)
   , showSettings = ref(false)
