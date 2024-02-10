@@ -69,6 +69,7 @@ function toggleSettings() {
 }
 
 function reset() {
+  window.navigator.vibrate(250)
   roles.value = roles.value.map(role => ({ ...role, currentCount: role.count }))
   settings.value.roles = roles.value
 }
@@ -76,6 +77,7 @@ function reset() {
 function changeRoleCount(number, sign) {
   const idx = numberToRoleIdx[number], current = roles.value[idx].currentCount, updated = current + sign
   if (0 <= updated && updated <= roles.value[idx].count) {
+    window.navigator.vibrate(sign === -1 ? [110, 50, 110] : 190)
     roles.value[idx].currentCount = updated
   }
   settings.value.roles = roles.value
