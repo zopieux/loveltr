@@ -12,8 +12,8 @@
 <script setup>
 import Role from './Role.vue'
 
-const props = defineProps({ roles: Array })
-const emit = defineEmits(['decrease', 'increase'])
+defineProps({ roles: Array })
+defineEmits(['decrease', 'increase'])
 </script>
 
 <style scoped lang="sass">
@@ -22,8 +22,7 @@ const emit = defineEmits(['decrease', 'increase'])
 #cards
   $gap: 5px
   gap: $gap
-  padding-block: calc($gap * 2)
-  // padding-inline: calc($gap * 2)
+  padding-block: $gap
   display: flex
   width: 100vw
   height: 100vh
@@ -45,12 +44,12 @@ const emit = defineEmits(['decrease', 'increase'])
       background-image: linear-gradient(transparentize($bg, 1.0) 0%, transparentize($bg, 1.0) 80%, $bg 98%, $bg 100%)
 
     @media screen and (orientation:portrait)
-      flex: 0 0 calc(100% / 2 - 2px - $gap)
+      flex: 0 0 calc(100% / 2 - $gap)
       aspect-ratio: 2/1
 
     @media screen and (orientation:landscape)
       aspect-ratio: 2/1
-      flex: 0 0 calc(100% / 4 - 2px - $gap)
+      flex: 0 0 calc(100% / 4 - $gap)
 
   &.cTen > div
     @media screen and (orientation:landscape)

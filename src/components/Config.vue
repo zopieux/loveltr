@@ -1,43 +1,94 @@
 <template>
-  <div class="top">
-    <select class="lang" v-model="$i18n.locale">
-      <option v-for="locale in $i18n.availableLocales" :key="`locale-${locale}`" :value="locale">{{ locale.toUpperCase() }}</option>
-    </select>
-    <button @click="$emit('resetDefaults')">{{ $t("defaults") }}</button>
-  </div>
-  <main>
-    <template v-for="role in roles" :key="role.number">
-      <div class="name">
-        <sup v-text="role.number"></sup>
-        <span v-text="$t(role.name)" />
+  <section>
+    <aside>
+      <header>
+        <IconSettings class="icon" @click="$emit('close')" />
+        <h4>{{ $t('settings') }}</h4>
+      </header>
+      <div class="row">
+        <select class="lang" v-model="$i18n.locale">
+          <option v-for="locale in $i18n.availableLocales" :key="`locale-${locale}`" :value="locale">{{
+            locale.toUpperCase()
+          }}</option>
+        </select>
+        <button @click="$emit('resetDefaults')">{{ $t("defaults") }}</button>
       </div>
-      <button @click="$emit('decrease', role.number)" :disabled="role.count === 0">-</button>
-      <span v-text="role.count" style="text-align: center" />
-      <button @click="$emit('increase', role.number)">+</button>
-    </template>
-  </main>
+    </aside>
+    <main>
+      <template v-for="role in roles" :key="role.number">
+        <div class="name">
+          <sup v-text="role.number"></sup>
+          <span v-text="$t(role.name)" />
+        </div>
+        <button @click="$emit('decrease', role.number)" :disabled="role.count === 0">-</button>
+        <span v-text="role.count" style="text-align: center" />
+        <button @click="$emit('increase', role.number)">+</button>
+      </template>
+    </main>
+  </section>
 </template>
 
 <script setup>
+import IconSettings from './IconSettings.vue'
+
 defineProps({
   roles: Array,
 })
-defineEmits(['decrease', 'increase', 'resetDefaults'])
+defineEmits(['decrease', 'increase', 'resetDefaults', 'close'])
 </script>
 
 <style scoped lang="sass">
 @import '../common.sass'
 
-div.top
+$gap: 0.8rem
+
+section
+  $top: 1rem
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: $gap
+  padding-block: $top
+
+  // @media screen and (orientation: portrait)
+
+  @media screen and (orientation: landscape)
+    flex-direction: row
+    align-items: flex-start
+    justify-content: center
+
+    aside
+      position: sticky
+      top: $top
+
+header
   display: flex
   flex-direction: row
-  gap: 1rem
+  align-items: center
+  gap: 5px
+
+  h4
+    font-size: 1.6rem
+    font-weight: normal
+    margin: 0
+    padding: 0
+    line-height: 1
+
+aside
+  display: flex
+  align-items: center
+  flex-direction: column
+  gap: $gap
+  .row
+    display: flex
+    flex-direction: row
+    justify-content: center
+    gap: $gap
 
 select.lang, button
   font: inherit
 
 main
-  width: fit-content
   padding-inline: 1rem
   column-gap: 1rem
   row-gap: .5rem

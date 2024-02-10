@@ -23,15 +23,20 @@
           </g>
         </g>
       </defs>
-      <use width="512" height="768" v-for="idx in Math.max(1, props.currentCount)" :xlink:href="`#${repId}`" :key="idx"
-        :x="`${xOff(idx)}`" :y="`${yOff(idx)}`" :transform="`scale(${scale(idx)})`" />
+      <use width="512" height="768" :xlink:href="`#${repId}`" />
     </svg>
+    <div class="dots">
+      <div :class="[{ dot: true, disabled: idx > props.currentCount }]" v-for="idx in props.count" :key="idx" />
+    </div>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
+
 import cardUrl from '../assets/card/bg1.png'
 import numBgUrl from '../assets/numbg.png'
+import bullet from '../assets/bullet.gif'
 
 import guard from '../assets/character/guard.png'
 import spy from '../assets/character/spy.png'
@@ -43,7 +48,8 @@ import handmaid from '../assets/character/handmaid.png'
 import countess from '../assets/character/countess.png'
 import chancellor from '../assets/character/chancelor.png'
 import king from '../assets/character/king.png'
-import { computed } from 'vue'
+
+const bulletUrl = `url(${bullet})`
 
 const props = defineProps({
   name: String,
@@ -51,10 +57,6 @@ const props = defineProps({
   count: Number,
   currentCount: Number,
 })
-
-const xOff = (idx) => props.currentCount > 1 ? (props.currentCount - idx) * 12 : 0
-const yOff = (idx) => (idx - 1) * 22
-const scale = (idx) => props.currentCount > 1 ? 1 - (props.currentCount - idx) * 0.05 : 1
 
 const bgUrl = computed(() =>
   ({ guard, baron, king, spy, princess, prince, priest, handmaid, countess, chancellor }[props.name]))
@@ -71,7 +73,37 @@ const buildId = p => `_${p}_id_${props.name.toLowerCase()}`
 
 .wrap
   position: relative
+  display: block
   pointer-events: none
+
+  .dots
+    position: absolute
+    vertical-align: top
+    top: 16%
+    left: 34%
+    right: 9%
+    padding-inline: 8%
+    display: flex
+    flex-wrap: wrap
+    flex-direction: row
+    justify-content: center
+    $gap: 5px
+    gap: $gap
+    column-gap: $gap
+
+    .dot
+      background-image: v-bind(bulletUrl)
+      background-size: cover
+      box-shadow: 0 0 0 2px white
+      width: calc(100% / 5)
+      aspect-ratio: 1
+      content: ''
+      background-color: red
+      border-radius: 100%
+
+      &.disabled
+        box-shadow: 0 0 0 2px #999
+        filter: grayscale(1)
 
 svg
   pointer-events: none

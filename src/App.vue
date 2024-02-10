@@ -1,19 +1,15 @@
 <template>
   <template v-if="!showSettings">
-    <section>
-      <Cards :roles="sortedRolesProbability" @increase="(number) => changeRoleCount(number, +1)"
-        @decrease="(number) => changeRoleCount(number, -1)" />
-      <IconSettings class="icon settings" @click="toggleSettings" />
-      <IconReset class="icon reset" @click="reset" />
-    </section>
+    <Cards :roles="sortedRolesProbability" @increase="(number) => changeRoleCount(number, +1)"
+      @decrease="(number) => changeRoleCount(number, -1)" />
+    <div class="buttons">
+      <IconSettings class="icon" @click="toggleSettings" />
+      <IconReset class="icon" @click="reset" />
+    </div>
   </template>
   <template v-if="showSettings">
-    <section>
-      <IconSettings class="icon settings" @click="toggleSettings" />
-      <h4>{{ $t('settings') }}</h4>
-      <Config :roles="roles" @increase="(number) => changeRoleSetting(number, +1)"
-        @decrease="(number) => changeRoleSetting(number, -1)" @resetDefaults="resetSettings" />
-    </section>
+    <Config :roles="roles" @close="toggleSettings" @increase="(number) => changeRoleSetting(number, +1)"
+      @decrease="(number) => changeRoleSetting(number, -1)" @resetDefaults="resetSettings" />
   </template>
 </template>
 
@@ -99,30 +95,17 @@ function resetSettings() {
 </script>
 
 <style scoped lang="sass">
-section
-  display: flex
-  align-items: center
-  flex-direction: column
-  gap: 0.7rem
+@import 'common.sass'
 
-h4
-  font-size: 2rem
-  font-weight: normal
-  margin: 0
-  padding: 0
-  padding-block-start: .5rem
-
-$w: 45px
-.icon
-  width: $w
-  height: $w
+.buttons
+  $w: $buttonSize
+  width: fit-content
+  height: $w + $w*0.15
+  bottom: 0
   z-index: 10
-  position: absolute
-  right: 10px
-
-  &.settings
-    top: 10px
-
-  &.reset
-    top: $w + 18px
+  position: fixed
+  display: flex
+  flex-direction: row
+  justify-content: center
+  gap: 5px
 </style>
